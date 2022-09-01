@@ -27,6 +27,7 @@ app.layout = html.Div([
 
     html.P(id='selected-cell'),
     html.P(id='selected-cols'),
+    html.Button("Swap Cols", id='swap-cols'),
     # create table using dash DataTable
     dash_table.DataTable(
         id='main-table',
@@ -63,9 +64,11 @@ def df_column_switch(_df, column1, column2):
     Input('main-table', 'selected_columns')
 )
 def column_swap(selected_columns):
-    if len(selected_columns) == 2:
-        df = pd.DataFrame(table_dict)
+    global df
+    if selected_columns and len(selected_columns) == 2:
         df = df_column_switch(df, selected_columns[0], selected_columns[1])
+        return df.to_dict('records'), [{"name": i, "id": i, "hideable": True, 'selectable': True} for i in df.columns]
+    else:
         return df.to_dict('records'), [{"name": i, "id": i, "hideable": True, 'selectable': True} for i in df.columns]
 
 
