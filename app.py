@@ -15,15 +15,15 @@ from example_table import table_dict
 df = pd.DataFrame(table_dict)
 
 # create table in plotly and display with dcc.Graph
-fig = go.Figure(data=[go.Table(
-    header=dict(values=list(df.columns)),
-    cells=dict(values=[df[col] for col in df.columns])
-)])
+# fig = go.Figure(data=[go.Table(
+#     header=dict(values=list(df.columns)),
+#     cells=dict(values=[df[col] for col in df.columns])
+# )])
 
 app.layout = html.Div([
     html.H1('Example Table'),
 
-    dcc.Graph(figure=fig),
+    # dcc.Graph(figure=fig),
 
     html.P(id='selected-cell'),
     html.P(id='selected-cols'),
@@ -33,6 +33,7 @@ app.layout = html.Div([
         id='main-table',
         data=df.to_dict('records'),
         columns=[{"name": i, "id": i, "hideable": True, 'selectable': True} for i in df.columns],
+        hidden_columns=['scan_uid'],
         sort_action='native',
         column_selectable='multi',
 
@@ -52,24 +53,28 @@ app.layout = html.Div([
 
 
 def df_column_switch(_df, column1, column2):
+    """ swap positions of two cols in dataframe """
     i = list(_df.columns)
     a, b = i.index(column1), i.index(column2)
     i[b], i[a] = i[a], i[b]
     _df = _df[i]
     return _df
 
+
 @app.callback(
     Output('main-table', 'data'),
     Output('main-table', 'columns'),
-    Input('main-table', 'selected_columns')
+    Input('swap-cols', 'n_clicks'),
+    Input('main-table', 'selected_columns'),
 )
-def column_swap(selected_columns):
+def column_swap(btn, selected_columns):
     global df
-    if selected_columns and len(selected_columns) == 2:
-        df = df_column_switch(df, selected_columns[0], selected_columns[1])
-        return df.to_dict('records'), [{"name": i, "id": i, "hideable": True, 'selectable': True} for i in df.columns]
-    else:
-        return df.to_dict('records'), [{"name": i, "id": i, "hideable": True, 'selectable': True} for i in df.columns]
+    print(dash.callback_context.triggered)
+    # check button press triggered call back
+    if 'swap-cols.n_clicks' == dash.callback_context.triggered[0]['prop_id']:  # callback_context -> ctx in newer dash versions
+        if selected_columns and len(selected_columns) == 2:
+            df = df_column_switch(df, selected_columns[0], selected_columns[1])
+    return df.to_dict('records'), [{"name": i, "id": i, "hideable": True, 'selectable': True} for i in df.columns]
 
 
 # callback decorator automatically runs function whenever input is changed
