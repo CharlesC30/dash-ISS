@@ -1,7 +1,7 @@
 import dash
 import dash_table
 import dash_core_components as dcc
-import dash_html_components as html
+from dash import html
 from dash.dependencies import Input, Output, State
 
 import plotly.graph_objs as go
@@ -15,10 +15,10 @@ from example_table import table_dict
 df = pd.DataFrame(table_dict)
 
 # create table in plotly and display with dcc.Graph
-# fig = go.Figure(data=[go.Table(
-#     header=dict(values=list(df.columns)),
-#     cells=dict(values=[df[col] for col in df.columns])
-# )])
+fig = go.Figure(data=[go.Table(
+    header=dict(values=list(df.columns)),
+    cells=dict(values=[df[col] for col in df.columns])
+)])
 
 app.layout = html.Div([
     html.H1('Example Table'),
@@ -69,9 +69,9 @@ def df_column_switch(_df, column1, column2):
 )
 def column_swap(btn, selected_columns):
     global df
-    print(dash.callback_context.triggered)
+    print(dash.ctx.triggered_id)
     # check button press triggered call back
-    if 'swap-cols.n_clicks' == dash.callback_context.triggered[0]['prop_id']:  # callback_context -> ctx in newer dash versions
+    if 'swap-cols' == dash.ctx.triggered_id:
         if selected_columns and len(selected_columns) == 2:
             df = df_column_switch(df, selected_columns[0], selected_columns[1])
     return df.to_dict('records'), [{"name": i, "id": i, "hideable": True, 'selectable': True} for i in df.columns]
