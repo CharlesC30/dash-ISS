@@ -1,7 +1,6 @@
 import dash
 import dash_table
-import dash_core_components as dcc
-from dash import html
+from dash import html, dcc
 from dash.dependencies import Input, Output, State
 
 import plotly.graph_objs as go
@@ -23,7 +22,7 @@ fig = go.Figure(data=[go.Table(
 app.layout = html.Div([
     html.H1('Example Table'),
 
-    # dcc.Graph(figure=fig),
+    dcc.Graph(figure=fig),
 
     html.P(id='selected-cell'),
     html.P(id='selected-cols'),
@@ -38,15 +37,9 @@ app.layout = html.Div([
         column_selectable='multi',
 
         # css styles
-        style_header={
-            'backgroundColor': 'black',
-            'color': 'white',
-        },
         style_cell={
             'textAlign': 'left',
             'font-family': 'arial',
-            'backgroundColor': 'gray',
-            'color': 'white',
         },
         )
 ])
